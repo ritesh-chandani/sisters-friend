@@ -1,0 +1,108 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+ 
+// Data structure to store a binary tree node
+struct Node
+{
+    int data;
+    Node *left, *right;
+ 
+    Node(int data)
+    {
+        this->data = data;
+        this->left = this->right = nullptr;
+    }
+};
+ 
+// Function to store inorder traversal on the tree in a vector
+void inorder(Node* node, vector<int> &vc)
+{
+    if (node == nullptr) {
+        return;
+    }
+ 
+    inorder(node->left, vc);
+    vc.push_back(node->data);
+    inorder(node->right, vc);
+}
+ 
+// Function to store postorder traversal on the tree in a vector
+void postorder(Node* node, vector<int> &vc)
+{
+    if (node == nullptr) {
+        return;
+    }
+ 
+    postorder(node->left, vc);
+    postorder(node->right, vc);
+    vc.push_back(node->data);
+}
+ 
+// Function to check if a given binary tree is a subtree of another
+// binary tree or not
+bool checkSubtree(Node* tree, Node* subtree)
+{
+    // base case: both trees are the same
+    if (tree == subtree) {
+        return true;
+    }
+ 
+    // base case: if the first tree is empty but the second tree is non-empty
+    if (tree == nullptr) {
+        return false;
+    }
+ 
+    // store inorder traversal of both trees in `first` and `second`, respectively
+    vector<int> first, second;
+    inorder(tree, first);
+    inorder(subtree, second);
+ 
+    // return false if `second` is not a subarray of `first`
+    auto it = search(first.begin(), first.end(), second.begin(), second.end());
+    if (it == first.end()) {
+        return false;
+    }
+ 
+    // reset both vectors
+    first.erase(first.begin(), first.end());
+    second.erase(second.begin(), second.end());
+ 
+    // Now store postorder traversal of both trees in `first` and `second`,
+    // respectively
+    postorder(tree, first);
+    postorder(subtree, second);
+ 
+    // return false if `second` is not a subarray of `first`
+    it = search(first.begin(), first.end(), second.begin(), second.end());
+    if (it == first.end()) {
+        return false;
+    }
+ 
+    return true;
+}
+ 
+int main()
+{
+    /* Construct the following tree
+              1
+            /   \
+           /     \
+          2       3
+         / \     / \
+        4   5   6   7
+    */
+ 
+    Node* root = new Node(1);
+    root->left = new Node(2);
+    root->right = new Node(3);
+    root->left->left = new Node(4);
+    root->left->right = new Node(5);
+    root->right->left = new Node(6);
+    root->right->right = new Node(7);
+ 
+    checkSubtree(root, root->right)? cout << "Yes": cout << "No";
+ 
+    return 0;
+}
